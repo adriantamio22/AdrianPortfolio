@@ -240,13 +240,24 @@ export const ContactSection = () => {
                 placeholder="ENCRYPTED_MESSAGE_HERE..."
               />
             </div>
-            <button 
+            <motion.button 
               type="submit"
-              className="w-full bg-accent hover:bg-accent/90 text-black font-mono font-bold uppercase tracking-widest py-4 flex items-center justify-center gap-2 transition-all border border-accent shadow-[0_0_15px_var(--color-accent-soft)]"
+              whileHover={{ 
+                scale: 1.02, 
+                boxShadow: "0 0 25px var(--color-accent-glow)",
+                backgroundColor: "#22d3ee" // slightly brighter cyan
+              }}
+              whileTap={{ scale: 0.98 }}
+              className="w-full bg-accent text-black font-mono font-bold uppercase tracking-widest py-4 flex items-center justify-center gap-2 transition-all border border-accent shadow-[0_0_15px_var(--color-accent-soft)] cursor-pointer"
             >
               <span>Transmit Protocol</span>
-              <Send size={16} />
-            </button>
+              <motion.div
+                animate={{ x: [0, 5, 0] }}
+                transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
+              >
+                <Send size={16} />
+              </motion.div>
+            </motion.button>
           </form>
         </div>
       </div>
