@@ -7,6 +7,33 @@ export const ThreeDGrid = () => (
   </div>
 );
 
+export const CyberBackground = () => (
+  <div className="fixed inset-0 z-[-1] pointer-events-none overflow-hidden bg-cyber-black">
+    <ThreeDGrid />
+    {/* Subtle Radial Gradient Glow */}
+    <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(6,182,212,0.05)_0%,transparent_50%)]" />
+    
+    {/* Scanline Effect */}
+    <motion.div 
+      animate={{ 
+        y: ['-100%', '100%'] 
+      }}
+      transition={{ 
+        duration: 12, 
+        repeat: Infinity, 
+        ease: "linear" 
+      }}
+      className="absolute inset-x-0 h-[1px] bg-accent/10 blur-[1px] z-[1]"
+    />
+
+    {/* Vignette / Mask */}
+    <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,transparent_0%,var(--color-cyber-black)_90%)]" />
+
+    {/* Subtle Noise / Grain */}
+    <div className="absolute inset-0 opacity-[0.05] mix-blend-overlay bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
+  </div>
+);
+
 interface TiltCardProps {
   children: ReactNode;
   className?: string;
@@ -64,15 +91,12 @@ export const TiltCard = ({ children, className = "" }: TiltCardProps) => {
 };
 
 export const Section = ({ children, id, className = "" }: { children: ReactNode, id: string, className?: string }) => (
-  <section id={id} className={`py-24 px-6 md:px-12 max-w-7xl mx-auto min-h-screen flex flex-col justify-center relative ${className}`}>
-    <div className="absolute inset-0 pointer-events-none -z-10 opacity-5">
-      <div className="w-full h-full bg-[radial-gradient(circle_at_50%_50%,var(--color-accent),transparent_70%)]" />
-    </div>
+  <section id={id} className={`py-32 px-6 md:px-12 max-w-7xl mx-auto min-h-screen flex flex-col justify-center relative ${className}`}>
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-100px" }}
-      transition={{ duration: 0.6, ease: "easeOut" }}
+      transition={{ duration: 0.8, ease: "easeOut" }}
     >
       {children}
     </motion.div>

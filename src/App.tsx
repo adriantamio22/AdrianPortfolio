@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
 import { Navbar, Hero } from './components/Navigation';
 import { AboutSection, ProjectSection, InterestsSection, ContactSection } from './components/Sections';
-import { ThreeDGrid } from './components/UI';
+import { CyberBackground } from './components/UI';
 import { TerminalConsole } from './components/Terminal';
 
 export default function App() {
   return (
     <div className="relative overflow-x-hidden text-cyber-text">
-      <ThreeDGrid />
+      <CyberBackground />
       <Navbar />
       
       <main>

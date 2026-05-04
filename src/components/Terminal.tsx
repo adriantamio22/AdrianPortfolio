@@ -47,13 +47,15 @@ export const TerminalConsole = () => {
     const query = input.trim();
     if (!query) return;
 
-    if (query.toLowerCase() === 'clear') {
+    const lowerQuery = query.toLowerCase();
+
+    if (lowerQuery === 'clear') {
       setHistory([]);
       setInput('');
       return;
     }
 
-    if (query.toLowerCase() === 'exit') {
+    if (lowerQuery === 'exit') {
       setIsOpen(false);
       setInput('');
       return;
@@ -61,6 +63,26 @@ export const TerminalConsole = () => {
 
     setHistory(prev => [...prev, `> ${query}`]);
     setInput('');
+
+    // Local Interactive Commands
+    if (lowerQuery === 'status') {
+      setHistory(prev => [...prev, "SYSTEM_REPORT: ALL_MODULES_OPERATIONAL", "THREAT_LEVEL: MINIMAL", "ENCLAVE_ENCRYPTION: ACTIVE"]);
+      return;
+    }
+
+    if (lowerQuery.startsWith('scan')) {
+      setIsTyping(true);
+      setTimeout(() => {
+        setHistory(prev => [...prev, "SCANNING_ENVIRONMENT...", "TRACING_HOP_PACKETS: [192.168.1.1] -> [PROXY_RELAY_A]", "NO_MALWARE_DETECTED. ENVIRONMENT_CLEAN."]);
+        setIsTyping(false);
+      }, 1500);
+      return;
+    }
+
+    if (lowerQuery === 'help') {
+      setHistory(prev => [...prev, "AVAILABLE_COMMANDS: [status], [scan], [clear], [exit], [help], or ask any question about Adrian."]);
+      return;
+    }
 
     if (!genAI.current) {
       setHistory(prev => [...prev, "SYSTEM_FAILURE: AI CORE NOT INITIALIZED. MISSING API KEY."]);

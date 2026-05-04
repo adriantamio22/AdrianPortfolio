@@ -46,24 +46,11 @@ export const SKILLS = {
 export const PROJECTS = [
   {
     id: 1,
-    title: "Enterprise Ticketing System",
-    description: "Architected and implemented a customized Jira service management platform for enterprise ticketing, automating incident workflows and improving resolution times.",
-    tags: ["Jira Admin", "Workflow Automation"],
-    link: "#"
-  },
-  {
-    id: 2,
-    title: "SIEM Deployment & Tuning",
-    description: "Specialized in configuring Wazuh and SentinelOne for high-fidelity alerting, reducing false positives by tuning detection rules against the MITRE ATT&CK framework.",
-    tags: ["Wazuh", "SentinelOne", "MITRE"],
-    link: "#"
-  },
-  {
-    id: 3,
-    title: "AI-Powered Threat Protection",
-    description: "Managing Abnormal AI portal to defend against advanced email threats and BEC (Business Email Compromise) through behavioral analysis.",
-    tags: ["Abnormal AI", "Email Security"],
-    link: "#"
+    title: "Scam Scanner",
+    description: "An advanced multi-vector threat analyzer and security portal. Features real-time URL analysis, mailbox forensics, IP reputation checking, and phishing pattern detection through high-fidelity behavioral signals.",
+    image: "https://images.unsplash.com/photo-1563986768609-322da13575f3?auto=format&fit=crop&q=80&w=1200",
+    tags: ["React", "AI Security", "Web Forensics", "Gemini AI"],
+    link: "https://scam-scanner1.vercel.app/"
   }
 ];
 

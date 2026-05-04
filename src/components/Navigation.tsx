@@ -88,64 +88,47 @@ export const Hero = () => {
   return (
     <div id="home" className="relative min-h-screen flex items-center pt-20 px-6">
       {/* Background Matrix Effect (Subtle) */}
-      <div className="absolute inset-0 overflow-hidden opacity-5 pointer-events-none">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,var(--color-accent),transparent)] w-full h-full" />
+      <div className="absolute inset-0 overflow-hidden opacity-10 pointer-events-none">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,var(--color-accent),transparent)] w-full h-full opacity-20" />
       </div>
 
-      <div className="max-w-7xl mx-auto w-full relative z-10">
+      <div className="max-w-7xl mx-auto w-full relative z-10 px-4 md:px-0">
           <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
-            style={{ 
-              transformStyle: "preserve-3d",
-              transform: "perspective(1000px)"
-            }}
           >
-            <motion.div
-              animate={{ 
-                rotateY: [0, 5, -5, 0],
-                rotateX: [0, -2, 2, 0]
-              }}
-              transition={{ 
-                duration: 10,
-                repeat: Infinity,
-                ease: "easeInOut"
-              }}
-            >
-              <div className="flex items-center gap-2 mb-6 text-accent font-mono text-sm tracking-widest uppercase">
-                <Terminal size={16} />
-                <span>System Deployment Successful</span>
-              </div>
+            <div className="flex items-center gap-2 mb-6 text-accent font-mono text-sm tracking-[0.4em] uppercase">
+              <Shield size={16} />
+              <span>Security_Portal // Operations_Active</span>
+            </div>
 
-              <h1 className="text-5xl md:text-8xl font-bold mb-6 tracking-tighter leading-none uppercase" style={{ transform: "translateZ(50px)" }}>
-                ADRIAN <span className="text-accent glow-cyan">TAMIO</span>
-              </h1>
-            </motion.div>
+            <h1 className="text-5xl md:text-8xl font-bold mb-6 tracking-tighter leading-tight uppercase">
+              ADRIAN <span className="text-accent glow-cyan">TAMIO</span>
+            </h1>
 
-            <div className="flex flex-col md:flex-row md:items-center gap-4 mb-8" style={{ transform: "translateZ(30px)" }}>
-              <h2 className="text-xl md:text-2xl font-mono text-cyber-muted italic">
-                &gt; Cybersecurity Analyst
+            <div className="flex flex-col md:flex-row md:items-center gap-4 mb-10">
+              <h2 className="text-xl md:text-2xl font-mono text-cyber-text tracking-tight uppercase">
+                &gt; Security Operations Analyst
               </h2>
-              <div className="hidden md:block w-2 h-2 rounded-full animate-pulse bg-status shadow-[0_0_8px_var(--color-status)]" />
-              <h2 className="text-xl md:text-2xl font-mono text-cyber-muted">
-                &gt; IT Operations & Support
+              <div className="hidden md:block w-1.5 h-1.5 rounded-full animate-pulse bg-status shadow-[0_0_8px_var(--color-status)]" />
+              <h2 className="text-xl md:text-2xl font-mono text-cyber-muted tracking-tight uppercase">
+                &gt; IT Specialist
               </h2>
             </div>
 
-          <p className="max-w-2xl text-cyber-muted text-lg leading-relaxed mb-10 font-light">
-            Defending digital environments while providing high-level technical support. 
-            Specialized in Microsoft ecosystems, incident response, and proactive security infrastructure.
-          </p>
+            <div className="max-w-2xl text-cyber-muted text-sm md:text-base leading-relaxed mb-12 font-light">
+              <p className="border-l border-accent/20 pl-6 italic">
+                "Specializing in defense-in-depth strategies and high-level enterprise technical operations."
+              </p>
+            </div>
 
           <div className="flex flex-wrap gap-4">
-            <a href="#contact" className="relative group overflow-hidden border border-accent px-8 py-3 bg-accent/10 hover:bg-accent transition-all duration-300">
-              <span className="relative z-10 font-mono text-sm uppercase tracking-widest text-accent group-hover:text-black">
-                Establish Connection
-              </span>
-            </a>
-            <a href="#projects" className="border border-white/20 px-8 py-3 hover:border-white/50 transition-all font-mono text-sm uppercase tracking-widest">
-              Project Logs
+            <a href="#projects" className="bg-accent text-black px-12 py-5 font-mono text-xs font-bold uppercase tracking-[0.3em] hover:bg-[#22d3ee] transition-all relative overflow-hidden group shadow-[0_0_20px_rgba(6,182,212,0.3)]">
+              <span className="relative z-10">Explore Work</span>
+              <motion.div 
+                className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-500" 
+              />
             </a>
           </div>
         </motion.div>
@@ -157,7 +140,7 @@ export const Hero = () => {
         transition={{ repeat: Infinity, duration: 2 }}
         className="absolute bottom-10 left-1/2 -translate-x-1/2"
       >
-        <div className="w-1 h-12 rounded-full bg-gradient-to-b from-accent to-transparent opacity-50" />
+        <div className="w-[1px] h-16 bg-gradient-to-b from-accent to-transparent opacity-50" />
       </motion.div>
     </div>
   );

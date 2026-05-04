@@ -1,7 +1,7 @@
 import { motion } from 'motion/react';
 import { CERTIFICATIONS, SKILLS, PROJECTS, INTERESTS } from '../constants';
 import { Section, Badge, TiltCard } from './UI';
-import { ExternalLink, Database, Cpu, Lock, Send, ShieldCheck, Mail, Activity, Laptop } from 'lucide-react';
+import { ExternalLink, Database, Cpu, Lock, Send, ShieldCheck, Mail, Activity, Laptop, Shield } from 'lucide-react';
 import React from 'react';
 
 export const AboutSection = () => {
@@ -110,36 +110,78 @@ export const AboutSection = () => {
 export const ProjectSection = () => {
   return (
     <Section id="projects">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
-        <div>
-          <div className="flex items-center gap-3 mb-4 text-accent">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16 px-4 md:px-0">
+        <div className="space-y-4">
+          <div className="flex items-center gap-3 text-accent">
             <div className="w-12 h-[1px] bg-accent" />
-            <h2 className="text-sm font-mono uppercase tracking-widest">Active Operations</h2>
+            <h2 className="text-sm font-mono uppercase tracking-[0.3em]">Projects</h2>
           </div>
-          <h3 className="text-4xl font-bold tracking-tight">Project Database</h3>
+          <h3 className="text-3xl md:text-4xl font-bold tracking-tight">Active <span className="text-accent">Operations</span> & Archive.</h3>
         </div>
-        <p className="max-w-md text-cyber-muted text-sm font-light">
-          A selection of technical implementations, security optimizations, and support infrastructure.
-        </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="max-w-6xl mx-auto">
         {PROJECTS.map((p) => (
-          <TiltCard key={p.id}>
-            <div className="group relative h-full bg-cyber-gray/20 border border-white/5 p-8 flex flex-col justify-between min-h-[300px] border-glow">
-              <div>
-                <div className="flex justify-between items-start mb-6">
-                  <Lock className="text-accent opacity-50 group-hover:opacity-100 transition-opacity" />
-                  <ExternalLink size={18} className="text-cyber-muted opacity-0 group-hover:opacity-100 transition-opacity" />
+          <div key={p.id} className="group relative">
+            <div className="grid grid-cols-1 lg:grid-cols-5 border border-white/10 bg-white/5 backdrop-blur-sm overflow-hidden transition-all duration-500 hover:border-accent/30">
+              {/* Main Image */}
+              <div className="lg:col-span-3 relative h-64 lg:h-auto overflow-hidden grayscale group-hover:grayscale-0 transition-all duration-700">
+                <img 
+                  src={p.image} 
+                  alt={p.title} 
+                  className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
+                  referrerPolicy="no-referrer"
+                />
+                <div className="absolute inset-0 bg-gradient-to-r from-cyber-black via-transparent to-transparent opacity-80" />
+                
+                <div className="absolute top-8 left-8 flex items-center gap-4">
+                  <div className="bg-accent/10 backdrop-blur-md border border-accent/20 p-2.5 rounded-lg">
+                    <ShieldCheck className="text-accent" size={24} />
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-[10px] font-mono text-accent uppercase tracking-[0.2em] leading-tight font-bold">System_Interface</span>
+                    <span className="text-xs font-mono text-white/50 uppercase tracking-widest font-light">SECURE_CORE_V4</span>
+                  </div>
                 </div>
-                <h4 className="text-xl font-bold mb-4 tracking-tight group-hover:text-accent transition-colors">{p.title}</h4>
-                <p className="text-sm text-cyber-muted leading-relaxed font-light">{p.description}</p>
               </div>
-              <div className="mt-8 flex flex-wrap gap-2">
-                {p.tags.map(tag => <Badge key={tag} variant="gray">{tag}</Badge>)}
+
+              {/* Content Panel */}
+              <div className="lg:col-span-2 p-8 md:p-12 flex flex-col justify-between space-y-12 bg-cyber-black/40">
+                <div className="space-y-8">
+                  <div className="flex items-center gap-3">
+                    <div className="w-1.5 h-1.5 rounded-full bg-status shadow-[0_0_10px_var(--color-status)]" />
+                    <span className="text-[10px] font-mono text-accent uppercase tracking-[0.4em] font-medium">Monitoring_Active</span>
+                  </div>
+                  
+                  <h4 className="text-2xl md:text-4xl font-bold tracking-tighter uppercase text-white leading-tight">
+                    {p.title}
+                  </h4>
+
+                  <p className="text-sm text-cyber-muted leading-relaxed font-light line-clamp-4">
+                    {p.description}
+                  </p>
+
+                  <div className="flex flex-wrap gap-2">
+                    {p.tags.map(tag => (
+                      <span key={tag} className="px-3 py-1 bg-white/5 border border-white/10 text-[9px] font-mono text-cyber-muted uppercase tracking-widest">
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                <a 
+                  href={p.link} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="group/link flex items-center justify-between p-5 bg-accent text-black font-mono text-xs font-bold uppercase tracking-[0.3em] hover:bg-white transition-all"
+                >
+                  <span>Launch Protocol</span>
+                  <ExternalLink size={14} className="group-hover/link:translate-x-1 transition-transform" />
+                </a>
               </div>
             </div>
-          </TiltCard>
+          </div>
         ))}
       </div>
     </Section>
