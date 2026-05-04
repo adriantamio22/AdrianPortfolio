@@ -1,8 +1,8 @@
-import { motion } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
 import { CERTIFICATIONS, SKILLS, PROJECTS, INTERESTS } from '../constants';
 import { Section, Badge, TiltCard } from './UI';
-import { ExternalLink, Database, Cpu, Lock, Send, ShieldCheck, Mail, Activity, Laptop, Shield } from 'lucide-react';
-import React from 'react';
+import { ExternalLink, Database, Cpu, Lock, Send, ShieldCheck, Mail, Activity, Laptop, Shield, X } from 'lucide-react';
+import React, { useState } from 'react';
 
 export const AboutSection = () => {
   return (
@@ -38,24 +38,28 @@ export const AboutSection = () => {
           <div className="mt-12 space-y-8">
             <div>
               <h4 className="font-mono text-xs uppercase tracking-widest text-accent mb-6">Security Focus</h4>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="flex flex-wrap gap-3">
                 {SKILLS.security.map(s => (
-                  <div key={s} className="flex items-center gap-2 text-sm">
-                    <ShieldCheck size={14} className="text-status" />
-                    <span>{s}</span>
-                  </div>
+                  <Badge key={s} variant="cyan">
+                    <span className="flex items-center gap-1.5">
+                      <ShieldCheck size={12} />
+                      {s}
+                    </span>
+                  </Badge>
                 ))}
               </div>
             </div>
             
             <div>
               <h4 className="font-mono text-xs uppercase tracking-widest text-accent mb-6">IT Support & Ops</h4>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="flex flex-wrap gap-3">
                 {SKILLS.support.map(s => (
-                  <div key={s} className="flex items-center gap-2 text-sm">
-                    <Laptop size={14} className="text-accent" />
-                    <span>{s}</span>
-                  </div>
+                  <Badge key={s} variant="green">
+                    <span className="flex items-center gap-1.5">
+                      <Laptop size={12} />
+                      {s}
+                    </span>
+                  </Badge>
                 ))}
               </div>
             </div>
@@ -107,7 +111,102 @@ export const AboutSection = () => {
   );
 };
 
+const ProjectModal = ({ project, onClose }: { project: any; onClose: () => void }) => {
+  return (
+    <motion.div 
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-8 bg-black/95 backdrop-blur-xl"
+      onClick={onClose}
+    >
+      <motion.div 
+        initial={{ scale: 0.9, y: 20 }}
+        animate={{ scale: 1, y: 0 }}
+        exit={{ scale: 0.9, y: 20 }}
+        className="bg-cyber-black border border-white/10 max-w-5xl w-full max-h-[90vh] overflow-y-auto relative rounded-lg shadow-2xl"
+        onClick={e => e.stopPropagation()}
+      >
+        <button 
+          onClick={onClose}
+          className="absolute top-4 right-4 z-10 p-2 bg-black/50 border border-white/10 hover:border-accent text-white transition-all rounded md:top-8 md:right-8 group"
+        >
+          <X size={24} className="group-hover:rotate-90 transition-transform duration-300" />
+        </button>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2">
+          <div className="relative aspect-video lg:aspect-auto lg:h-[700px]">
+            <img 
+              src={project.image} 
+              alt={project.title} 
+              className="w-full h-full object-cover shadow-[inset_0_0_100px_rgba(0,0,0,0.5)]" 
+              referrerPolicy="no-referrer" 
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-cyber-black via-transparent to-transparent opacity-80" />
+            <div className="absolute bottom-8 left-8">
+               <div className="flex items-center gap-2 mb-2">
+                 <Shield className="text-accent" size={16} />
+                 <span className="text-[10px] font-mono text-accent uppercase tracking-widest font-bold">Secure_Interface_View</span>
+               </div>
+               <p className="text-[9px] font-mono text-white/40 tracking-widest uppercase">ID: {project.id.toString().padStart(4, '0')}</p>
+            </div>
+          </div>
+
+          <div className="p-8 md:p-12 space-y-10">
+            <div className="space-y-4">
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-status shadow-[0_0_10px_var(--color-status)]" />
+                <span className="text-[10px] font-mono text-accent uppercase tracking-[0.4em] font-medium">Core_Investigation</span>
+              </div>
+              <h2 className="text-3xl md:text-5xl font-bold tracking-tighter uppercase text-white leading-tight">{project.title}</h2>
+            </div>
+
+            <div className="space-y-6">
+              <p className="text-cyber-muted text-base font-light leading-relaxed">
+                {project.description}
+              </p>
+              
+              <div className="p-6 bg-accent/5 border-l-2 border-accent space-y-4">
+                <div className="flex items-center gap-2">
+                  <Activity size={14} className="text-accent" />
+                  <span className="text-[10px] font-mono text-white uppercase tracking-widest">Architectural Context</span>
+                </div>
+                <p className="text-xs text-cyber-muted italic leading-relaxed">
+                  "Implementation focus centered on defensive engineering and risk mitigation. This module demonstrates secure pipeline architecture and automated threat detection capabilities within modern enterprise ecosystems."
+                </p>
+              </div>
+            </div>
+
+            <div className="space-y-6">
+              <h4 className="text-[10px] font-mono text-white/40 uppercase tracking-widest border-b border-white/5 pb-2">Stack Dependencies</h4>
+              <div className="flex flex-wrap gap-2">
+                {project.tags.map(tag => (
+                  <Badge key={tag} variant="cyan">{tag}</Badge>
+                ))}
+              </div>
+            </div>
+
+            <div className="pt-6">
+              <a 
+                href={project.link} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="w-full lg:w-auto inline-flex items-center justify-between gap-8 px-10 py-5 bg-accent text-black font-mono text-xs font-bold uppercase tracking-[0.3em] hover:bg-white transition-all shadow-glow group"
+              >
+                Access Live Module
+                <ExternalLink size={18} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+              </a>
+            </div>
+          </div>
+        </div>
+      </motion.div>
+    </motion.div>
+  );
+};
+
 export const ProjectSection = () => {
+  const [selectedProject, setSelectedProject] = useState<any>(null);
+
   return (
     <Section id="projects">
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16 px-4 md:px-0">
@@ -120,9 +219,13 @@ export const ProjectSection = () => {
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto">
+      <div className="max-w-6xl mx-auto space-y-12">
         {PROJECTS.map((p) => (
-          <div key={p.id} className="group relative">
+          <div 
+            key={p.id} 
+            className="group relative cursor-pointer"
+            onClick={() => setSelectedProject(p)}
+          >
             <div className="grid grid-cols-1 lg:grid-cols-5 border border-white/10 bg-white/5 backdrop-blur-sm overflow-hidden transition-all duration-500 hover:border-accent/30">
               {/* Main Image */}
               <div className="lg:col-span-3 relative h-64 lg:h-auto overflow-hidden grayscale group-hover:grayscale-0 transition-all duration-700">
@@ -153,7 +256,7 @@ export const ProjectSection = () => {
                     <span className="text-[10px] font-mono text-accent uppercase tracking-[0.4em] font-medium">Monitoring_Active</span>
                   </div>
                   
-                  <h4 className="text-2xl md:text-4xl font-bold tracking-tighter uppercase text-white leading-tight">
+                  <h4 className="text-2xl md:text-4xl font-bold tracking-tighter uppercase text-white leading-tight transition-colors group-hover:text-accent">
                     {p.title}
                   </h4>
 
@@ -170,20 +273,32 @@ export const ProjectSection = () => {
                   </div>
                 </div>
 
-                <a 
-                  href={p.link} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="group/link flex items-center justify-between p-5 bg-accent text-black font-mono text-xs font-bold uppercase tracking-[0.3em] hover:bg-white transition-all"
-                >
-                  <span>Launch Protocol</span>
-                  <ExternalLink size={14} className="group-hover/link:translate-x-1 transition-transform" />
-                </a>
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-mono text-accent uppercase tracking-[0.2em] opacity-0 group-hover:opacity-100 transition-opacity">View Details // Investigation</span>
+                  <a 
+                    href={p.link} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    onClick={(e) => e.stopPropagation()}
+                    className="group/link flex items-center justify-between p-4 px-6 bg-accent text-black font-mono text-xs font-bold uppercase tracking-[0.3em] hover:bg-white transition-all"
+                  >
+                    <ExternalLink size={14} className="group-hover/link:scale-110 transition-transform" />
+                  </a>
+                </div>
               </div>
             </div>
           </div>
         ))}
       </div>
+
+      <AnimatePresence>
+        {selectedProject && (
+          <ProjectModal 
+            project={selectedProject} 
+            onClose={() => setSelectedProject(null)} 
+          />
+        )}
+      </AnimatePresence>
     </Section>
   );
 };

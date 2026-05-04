@@ -14,7 +14,7 @@ export const Navbar = () => {
 
   const navLinks = [
     { name: 'Root', href: '#home' },
-    { name: 'Bio', href: '#about' },
+    { name: 'About', href: '#about' },
     { name: 'Projects', href: '#projects' },
     { name: 'Contact', href: '#contact' },
   ];
@@ -25,7 +25,7 @@ export const Navbar = () => {
         <a href="#home" className="flex items-center gap-2 group">
           <Shield className="w-6 h-6 text-accent group-hover:scale-110 transition-transform" />
           <span className="font-mono text-lg font-bold tracking-tighter uppercase">
-            ADRIAN<span className="text-accent italic">.SOC</span>
+            ADRIAN<span className="text-accent">.SOC</span>
           </span>
         </a>
 
@@ -100,7 +100,7 @@ export const Hero = () => {
           >
             <div className="flex items-center gap-2 mb-6 text-accent font-mono text-sm tracking-[0.4em] uppercase">
               <Shield size={16} />
-              <span>Security_Portal // Operations_Active</span>
+              <span>Work Portfolio // Operations_Active</span>
             </div>
 
             <h1 className="text-5xl md:text-8xl font-bold mb-6 tracking-tighter leading-tight uppercase">
@@ -117,17 +117,17 @@ export const Hero = () => {
               </h2>
             </div>
 
-            <div className="max-w-2xl text-cyber-muted text-sm md:text-base leading-relaxed mb-12 font-light">
-              <p className="border-l border-accent/20 pl-6 italic">
-                "Specializing in defense-in-depth strategies and high-level enterprise technical operations."
-              </p>
-            </div>
-
           <div className="flex flex-wrap gap-4">
             <a href="#projects" className="bg-accent text-black px-12 py-5 font-mono text-xs font-bold uppercase tracking-[0.3em] hover:bg-[#22d3ee] transition-all relative overflow-hidden group shadow-[0_0_20px_rgba(6,182,212,0.3)]">
               <span className="relative z-10">Explore Work</span>
               <motion.div 
                 className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-500" 
+              />
+            </a>
+            <a href="#contact" className="border border-white/10 text-white px-12 py-5 font-mono text-xs font-bold uppercase tracking-[0.3em] hover:border-accent hover:text-accent transition-all relative overflow-hidden group">
+              <span className="relative z-10">Connect with me</span>
+              <motion.div 
+                className="absolute inset-0 bg-accent/5 translate-y-[100%] group-hover:translate-y-[0%] transition-transform duration-300" 
               />
             </a>
           </div>
