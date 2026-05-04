@@ -7,6 +7,7 @@ import { TerminalConsole } from './components/Terminal';
 export default function App() {
   return (
     <div className="relative overflow-x-hidden text-cyber-text">
+      <ThreeDGrid />
       <Navbar />
       
       <main>

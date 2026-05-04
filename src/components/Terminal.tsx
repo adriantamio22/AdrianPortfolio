@@ -27,7 +27,14 @@ export const TerminalConsole = () => {
   const [isTyping, setIsTyping] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   
-  const ai = useRef(new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY }));
+  const genAI = useRef<GoogleGenAI | null>(null);
+
+  useEffect(() => {
+    const key = process.env.GEMINI_API_KEY;
+    if (key) {
+      genAI.current = new GoogleGenAI({ apiKey: key });
+    }
+  }, []);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -54,18 +61,23 @@ export const TerminalConsole = () => {
 
     setHistory(prev => [...prev, `> ${query}`]);
     setInput('');
+
+    if (!genAI.current) {
+      setHistory(prev => [...prev, "SYSTEM_FAILURE: AI CORE NOT INITIALIZED. MISSING API KEY."]);
+      return;
+    }
+
     setIsTyping(true);
 
     try {
-      const response = await ai.current.models.generateContent({
-        model: "gemini-3-flash-preview",
-        contents: query,
-        config: {
-          systemInstruction: SYSTEM_PROMPT,
-        }
+      const model = genAI.current.getGenerativeModel({
+        model: "gemini-1.5-flash",
+        systemInstruction: SYSTEM_PROMPT,
       });
-      
-      const text = response.text || "PROTOCOL_ERROR: FAILED TO RETRIEVE DATA.";
+
+      const result = await model.generateContent(query);
+      const response = await result.response;
+      const text = response.text() || "PROTOCOL_ERROR: FAILED TO RETRIEVE DATA.";
       setHistory(prev => [...prev, text]);
     } catch (error) {
       setHistory(prev => [...prev, "SYSTEM_FAILURE: CONNECTION TO AI CORE INTERRUPTED."]);

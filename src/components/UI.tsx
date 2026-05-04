@@ -1,7 +1,19 @@
 import React, { ReactNode, useState, useEffect, useRef } from 'react';
 import { motion, useMotionValue, useTransform, useSpring } from 'motion/react';
 
-export const TiltCard = ({ children, className = "" }: { children: ReactNode, className?: string }) => {
+export const ThreeDGrid = () => (
+  <div className="absolute inset-0 z-[-1] pointer-events-none opacity-20">
+    <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]" />
+  </div>
+);
+
+interface TiltCardProps {
+  children: ReactNode;
+  className?: string;
+  key?: React.Key;
+}
+
+export const TiltCard = ({ children, className = "" }: TiltCardProps) => {
   const x = useMotionValue(0);
   const y = useMotionValue(0);
 
