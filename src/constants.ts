@@ -53,7 +53,7 @@ screenshots: [
   "/scam-scanner-dashboard.png",
   "/scam-scanner-login.png",
   "/scam-scanner-output.png"
-],,
+],
     tags: ["Email Analysis", "Domain Lookup", "IP Analysis"],
     link: "https://scam-scanner1.vercel.app/"
   }
