@@ -27,6 +27,9 @@
 }
 
 @layer base {
+  html {
+    scroll-behavior: smooth;
+  }
   body {
     @apply bg-cyber-black text-cyber-text font-sans selection:bg-accent selection:text-white transition-all duration-500;
   }

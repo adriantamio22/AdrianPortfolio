@@ -1,5 +1,5 @@
 import React, { ReactNode, useState, useEffect, useRef } from 'react';
-import { motion, useMotionValue, useTransform, useSpring } from 'motion/react';
+import { motion, useMotionValue, useTransform, useSpring, AnimatePresence } from 'motion/react';
 
 export const ThreeDGrid = () => (
   <div className="absolute inset-0 z-[-1] pointer-events-none opacity-20">
@@ -10,8 +10,50 @@ export const ThreeDGrid = () => (
 export const CyberBackground = () => (
   <div className="fixed inset-0 z-[-1] pointer-events-none overflow-hidden bg-cyber-black">
     <ThreeDGrid />
+    
     {/* Subtle Radial Gradient Glow */}
     <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(6,182,212,0.05)_0%,transparent_50%)]" />
+    
+    {/* Circuit Board Patterns (Very Subtle) */}
+    <div className="absolute inset-0 opacity-[0.03]">
+      <svg width="100%" height="100%" className="absolute inset-0">
+        <pattern id="circuit-pattern" x="0" y="0" width="200" height="200" patternUnits="userSpaceOnUse">
+          <path d="M 0 100 L 50 100 L 70 80 L 130 80 L 150 100 L 200 100" fill="none" stroke="currentColor" strokeWidth="0.5" className="text-accent" />
+          <path d="M 100 0 L 100 50 L 80 70 L 80 130 L 100 150 L 100 200" fill="none" stroke="currentColor" strokeWidth="0.5" className="text-accent" />
+          <circle cx="70" cy="80" r="1.5" fill="currentColor" className="text-accent" />
+          <circle cx="130" cy="80" r="1.5" fill="currentColor" className="text-accent" />
+          <circle cx="80" cy="70" r="1.5" fill="currentColor" className="text-accent" />
+          <circle cx="80" cy="130" r="1.5" fill="currentColor" className="text-accent" />
+        </pattern>
+        <rect width="100%" height="100%" fill="url(#circuit-pattern)" />
+      </svg>
+    </div>
+
+    {/* Moving Data Streams (Horizontal) */}
+    <div className="absolute inset-0 overflow-hidden opacity-[0.02]">
+      {Array.from({ length: 12 }).map((_, i) => (
+        <motion.div
+          key={`stream-${i}`}
+          initial={{ x: '-100%', opacity: 0 }}
+          animate={{ 
+            x: ['-100%', '200%'],
+            opacity: [0, 1, 1, 0]
+          }}
+          transition={{ 
+            duration: 15 + Math.random() * 20, 
+            repeat: Infinity, 
+            delay: i * 3,
+            ease: "linear" 
+          }}
+          style={{ top: `${i * 8 + 5}%` }}
+          className="absolute font-mono text-[8px] whitespace-nowrap text-accent tracking-[2em]"
+        >
+          {Array.from({ length: 40 }).map(() => (
+            Math.random().toString(36).substring(2, 4).toUpperCase()
+          )).join(' ')}
+        </motion.div>
+      ))}
+    </div>
     
     {/* Scanline Effect */}
     <motion.div 
@@ -33,6 +75,70 @@ export const CyberBackground = () => (
     <div className="absolute inset-0 opacity-[0.05] mix-blend-overlay bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
   </div>
 );
+
+export const PageTransition = () => {
+  const [active, setActive] = useState(false);
+
+  useEffect(() => {
+    const triggerNav = () => {
+      setActive(true);
+      setTimeout(() => setActive(false), 800);
+    };
+    window.addEventListener('nav-click', triggerNav);
+    return () => window.removeEventListener('nav-click', triggerNav);
+  }, []);
+
+  return (
+    <AnimatePresence>
+      {active && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 z-[9999] pointer-events-none"
+        >
+          {/* Main Scanner Wipe */}
+          <motion.div 
+            initial={{ scaleX: 0, originX: 0 }}
+            animate={{ scaleX: [0, 1, 1], originX: [0, 0, 1] }}
+            transition={{ duration: 0.8, ease: "easeInOut" }}
+            className="absolute inset-0 bg-accent/20 backdrop-blur-[2px]"
+          />
+          
+          {/* Leading Scanline */}
+          <motion.div
+            initial={{ left: '-2px' }}
+            animate={{ left: ['0%', '100%'] }}
+            transition={{ duration: 0.8, ease: "easeInOut" }}
+            className="absolute top-0 bottom-0 w-[2px] bg-accent shadow-[0_0_15px_var(--color-accent)]"
+          />
+
+          {/* Data Fragments during transition */}
+          <div className="absolute inset-0 overflow-hidden">
+            {Array.from({ length: 15 }).map((_, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ 
+                  opacity: [0, 1, 0],
+                  x: 0
+                }}
+                transition={{ duration: 0.4, delay: i * 0.03 + 0.2 }}
+                style={{ 
+                  top: `${Math.random() * 100}%`,
+                  left: `${Math.random() * 100}%`
+                }}
+                className="absolute font-mono text-[10px] text-accent/60"
+              >
+                {Math.random().toString(16).substring(2, 6).toUpperCase()}
+              </motion.div>
+            ))}
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+};
 
 interface TiltCardProps {
   children: ReactNode;

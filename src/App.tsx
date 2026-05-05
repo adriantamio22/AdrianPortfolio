@@ -1,13 +1,14 @@
 import { useState, useEffect } from 'react';
 import { Navbar, Hero } from './components/Navigation';
 import { AboutSection, ProjectSection, InterestsSection, ContactSection } from './components/Sections';
-import { CyberBackground } from './components/UI';
+import { CyberBackground, PageTransition } from './components/UI';
 import { TerminalConsole } from './components/Terminal';
 
 export default function App() {
   return (
     <div className="relative overflow-x-hidden text-cyber-text">
       <CyberBackground />
+      <PageTransition />
       <Navbar />
       
       <main>
