@@ -48,11 +48,11 @@ export const PROJECTS = [
     id: 1,
     title: "Scam Scanner",
     description: "An advanced multi-vector threat analyzer and security portal. Features real-time URL analysis, mailbox forensics, IP reputation checking, and phishing pattern detection through high-fidelity behavioral signals.",
-    image: "https://i.ibb.co/twHGQQV7/scam-scanner-dashboard.png",
+    image: "https://i.ibb.co/twHGQQV7/scam-scanner-dashboard.png?v=1.0.1",
     screenshots: [
-      "https://i.ibb.co/twHGQQV7/scam-scanner-dashboard.png",
-      "https://i.ibb.co/5h3ZSXtN/scam-scanner-login.png",
-      "https://i.ibb.co/qM9qN3Fw/scam-scanner-output.png"
+      "https://i.ibb.co/twHGQQV7/scam-scanner-dashboard.png?v=1.0.1",
+      "https://i.ibb.co/5h3ZSXtN/scam-scanner-login.png?v=1.0.1",
+      "https://i.ibb.co/qM9qN3Fw/scam-scanner-output.png?v=1.0.1"
     ],
     tags: ["Email Analysis", "Domain Lookup", "IP Analysis"],
     link: "https://scam-scanner1.vercel.app/"
