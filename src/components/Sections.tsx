@@ -261,7 +261,7 @@ const ProjectModal = ({ project, onClose }: { project: any; onClose: () => void 
                       onClick={() => setActiveImage(img)}
                       className={`relative w-24 h-16 md:w-32 md:h-20 border overflow-hidden transition-all duration-300 rounded ${activeImage === img ? 'border-accent ring-2 ring-accent/30 p-0.5' : 'border-white/10 opacity-50 hover:opacity-100'}`}
                     >
-                      <img src={img} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                      <img src={img} className="w-full h-full object-cover" />
                       {activeImage === img && (
                         <div className="absolute inset-0 bg-accent/20 pointer-events-none transition-opacity duration-300" />
                       )}
