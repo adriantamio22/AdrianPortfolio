@@ -1,7 +1,7 @@
 import { motion, AnimatePresence } from 'motion/react';
 import { CERTIFICATIONS, SKILLS, PROJECTS, INTERESTS } from '../constants';
 import { Section, Badge, TiltCard } from './UI';
-import { ExternalLink, Database, Cpu, Lock, Send, ShieldCheck, Mail, Activity, Laptop, Shield, X } from 'lucide-react';
+import { ExternalLink, Database, Cpu, Lock, Send, ShieldCheck, Mail, Activity, Laptop, Shield, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import React, { useState } from 'react';
 
 export const AboutSection = () => {
@@ -110,97 +110,199 @@ export const AboutSection = () => {
     </Section>
   );
 };
-
 const ProjectModal = ({ project, onClose }: { project: any; onClose: () => void }) => {
+  const [activeImage, setActiveImage] = useState(project.image);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const images = project.screenshots || project.gallery || [project.image];
+
+  const nextImage = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const currentIndex = images.indexOf(activeImage);
+    const nextIndex = (currentIndex + 1) % images.length;
+    setActiveImage(images[nextIndex]);
+  };
+
+  const prevImage = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const currentIndex = images.indexOf(activeImage);
+    const prevIndex = (currentIndex - 1 + images.length) % images.length;
+    setActiveImage(images[prevIndex]);
+  };
+
   return (
-    <motion.div 
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-8 bg-black/95 backdrop-blur-xl"
-      onClick={onClose}
-    >
+    <>
       <motion.div 
-        initial={{ scale: 0.9, y: 20 }}
-        animate={{ scale: 1, y: 0 }}
-        exit={{ scale: 0.9, y: 20 }}
-        className="bg-cyber-black border border-white/10 max-w-5xl w-full max-h-[90vh] overflow-y-auto relative rounded-lg shadow-2xl"
-        onClick={e => e.stopPropagation()}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-8 bg-black/95 backdrop-blur-xl"
+        onClick={onClose}
       >
-        <button 
-          onClick={onClose}
-          className="absolute top-4 right-4 z-10 p-2 bg-black/50 border border-white/10 hover:border-accent text-white transition-all rounded md:top-8 md:right-8 group"
+        <motion.div 
+          initial={{ scale: 0.9, y: 20 }}
+          animate={{ scale: 1, y: 0 }}
+          exit={{ scale: 0.9, y: 20 }}
+          className="bg-cyber-black border border-white/10 max-w-6xl w-full max-h-[90vh] overflow-y-auto relative rounded-lg shadow-2xl flex flex-col md:block"
+          onClick={e => e.stopPropagation()}
         >
-          <X size={24} className="group-hover:rotate-90 transition-transform duration-300" />
-        </button>
+          <button 
+            onClick={onClose}
+            className="absolute top-4 right-4 z-20 p-2 bg-black/50 border border-white/10 hover:border-accent text-white transition-all rounded md:top-8 md:right-8 group"
+          >
+            <X size={24} className="group-hover:rotate-90 transition-transform duration-300" />
+          </button>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2">
-          <div className="relative aspect-video lg:aspect-auto lg:h-[700px]">
-            <img 
-              src={project.image} 
-              alt={project.title} 
-              className="w-full h-full object-cover shadow-[inset_0_0_100px_rgba(0,0,0,0.5)]" 
-              referrerPolicy="no-referrer" 
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-cyber-black via-transparent to-transparent opacity-80" />
-            <div className="absolute bottom-8 left-8">
-               <div className="flex items-center gap-2 mb-2">
-                 <Shield className="text-accent" size={16} />
-                 <span className="text-[10px] font-mono text-accent uppercase tracking-widest font-bold">Secure_Interface_View</span>
-               </div>
-               <p className="text-[9px] font-mono text-white/40 tracking-widest uppercase">ID: {project.id.toString().padStart(4, '0')}</p>
-            </div>
-          </div>
+          <div className="grid grid-cols-1 min-h-[600px]">
+            <div className="relative aspect-video lg:aspect-auto h-[400px] lg:h-[600px] group/main overflow-hidden bg-black/40">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={activeImage}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+                  className="w-full h-full"
+                >
+                  <img 
+                    src={activeImage} 
+                    alt={project.title} 
+                    className="w-full h-full object-contain cursor-zoom-in" 
+                    referrerPolicy="no-referrer" 
+                    onClick={() => setIsFullscreen(true)}
+                  />
+                </motion.div>
+              </AnimatePresence>
 
-          <div className="p-8 md:p-12 space-y-10">
-            <div className="space-y-4">
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-status shadow-[0_0_10px_var(--color-status)]" />
-                <span className="text-[10px] font-mono text-accent uppercase tracking-[0.4em] font-medium">Core_Investigation</span>
-              </div>
-              <h2 className="text-3xl md:text-5xl font-bold tracking-tighter uppercase text-white leading-tight">{project.title}</h2>
-            </div>
-
-            <div className="space-y-6">
-              <p className="text-cyber-muted text-base font-light leading-relaxed">
-                {project.description}
-              </p>
+              {/* Navigation Controls */}
+              {images.length > 1 && (
+                <>
+                  <button 
+                    onClick={prevImage}
+                    className="absolute left-4 top-1/2 -translate-y-1/2 z-20 p-3 bg-black/40 backdrop-blur-md border border-white/10 hover:border-accent text-white transition-all rounded-full group/nav opacity-0 group-hover/main:opacity-100"
+                  >
+                    <ChevronLeft size={24} className="group-hover/nav:-translate-x-1 transition-transform" />
+                  </button>
+                  <button 
+                    onClick={nextImage}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 z-20 p-3 bg-black/40 backdrop-blur-md border border-white/10 hover:border-accent text-white transition-all rounded-full group/nav opacity-0 group-hover/main:opacity-100"
+                  >
+                    <ChevronRight size={24} className="group-hover/nav:translate-x-1 transition-transform" />
+                  </button>
+                </>
+              )}
+              <div className="absolute inset-0 bg-gradient-to-t from-cyber-black/90 via-transparent to-transparent pointer-events-none" />
               
-              <div className="p-6 bg-accent/5 border-l-2 border-accent space-y-4">
-                <div className="flex items-center gap-2">
-                  <Activity size={14} className="text-accent" />
-                  <span className="text-[10px] font-mono text-white uppercase tracking-widest">Architectural Context</span>
-                </div>
-                <p className="text-xs text-cyber-muted italic leading-relaxed">
-                  "Implementation focus centered on defensive engineering and risk mitigation. This module demonstrates secure pipeline architecture and automated threat detection capabilities within modern enterprise ecosystems."
-                </p>
-              </div>
-            </div>
-
-            <div className="space-y-6">
-              <h4 className="text-[10px] font-mono text-white/40 uppercase tracking-widest border-b border-white/5 pb-2">Stack Dependencies</h4>
-              <div className="flex flex-wrap gap-2">
-                {project.tags.map(tag => (
-                  <Badge key={tag} variant="cyan">{tag}</Badge>
-                ))}
-              </div>
-            </div>
-
-            <div className="pt-6">
-              <a 
-                href={project.link} 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="w-full lg:w-auto inline-flex items-center justify-between gap-8 px-10 py-5 bg-accent text-black font-mono text-xs font-bold uppercase tracking-[0.3em] hover:bg-white transition-all shadow-glow group"
+              {/* Fullscreen Trigger Overlay */}
+              <motion.div 
+                initial={{ opacity: 0 }}
+                whileHover={{ opacity: 1 }}
+                className="absolute inset-0 flex items-center justify-center bg-black/40 backdrop-blur-[4px] opacity-0 transition-opacity duration-500 pointer-events-none group-hover/main:pointer-events-auto cursor-zoom-in"
+                onClick={() => setIsFullscreen(true)}
               >
-                Access Live Module
-                <ExternalLink size={18} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
-              </a>
+                <div className="p-4 rounded-full border border-accent/30 bg-black/40 text-accent transition-all duration-300 hover:bg-accent hover:text-black">
+                  <Laptop size={28} />
+                </div>
+              </motion.div>
+
+              <div className="absolute bottom-10 left-10 hidden md:block">
+                 <div className="flex items-center gap-4 bg-black/40 backdrop-blur-md px-6 py-3 border border-white/5 rounded-full">
+                   <p className="text-[10px] font-mono text-white/60 tracking-widest uppercase">{project.title}</p>
+                   <div className="w-8 h-[1px] bg-white/20" />
+                   <p className="text-[10px] font-mono text-white/40 tracking-widest uppercase">{images.indexOf(activeImage) + 1} / {images.length}</p>
+                 </div>
+              </div>
+            </div>
+
+            <div className="p-10 md:p-16 space-y-12 bg-gradient-to-b from-black/20 to-black/40">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+                <div className="space-y-6">
+                  <div className="flex items-center gap-3">
+                    <div className="w-2 h-2 rounded-full bg-accent shadow-[0_0_10px_var(--color-accent)] pulse" />
+                  </div>
+                  <h2 className="text-4xl md:text-6xl font-black tracking-tighter uppercase text-white leading-[0.9]">{project.title}</h2>
+                  <p className="text-cyber-muted text-lg font-light leading-relaxed max-w-xl">
+                    {project.description}
+                  </p>
+                </div>
+
+                <div className="space-y-10">
+                  <div className="space-y-6">
+                    <div className="flex flex-wrap gap-2">
+                      {project.tags.map(tag => (
+                        <Badge key={tag} variant="cyan" className="px-4 py-1">{tag}</Badge>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="pt-4">
+                    <motion.a 
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      href={project.link} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center justify-between gap-16 px-12 py-6 bg-accent text-black font-mono text-sm font-black uppercase tracking-[0.4em] hover:bg-white transition-all shadow-glow group"
+                    >
+                      Open Live Portal
+                      <ExternalLink size={20} className="group-hover:translate-x-2 group-hover:-translate-y-2 transition-transform duration-300" />
+                    </motion.a>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Thumbnail Gallery */}
+              <div className="mt-8">
+                <div className="flex flex-wrap gap-4">
+                  {images.map((img: string, idx: number) => (
+                    <motion.button 
+                      key={idx}
+                      whileHover={{ scale: 1.05, borderColor: "var(--color-accent)" }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => setActiveImage(img)}
+                      className={`relative w-24 h-16 md:w-32 md:h-20 border overflow-hidden transition-all duration-300 rounded ${activeImage === img ? 'border-accent ring-2 ring-accent/30 p-0.5' : 'border-white/10 opacity-50 hover:opacity-100'}`}
+                    >
+                      <img src={img} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                      {activeImage === img && (
+                        <div className="absolute inset-0 bg-accent/20 pointer-events-none transition-opacity duration-300" />
+                      )}
+                    </motion.button>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
-        </div>
+        </motion.div>
       </motion.div>
-    </motion.div>
+
+      {/* Fullscreen Lightbox Overlay */}
+      <AnimatePresence>
+        {isFullscreen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] bg-black/98 flex items-center justify-center p-4 backdrop-blur-2xl"
+            onClick={() => setIsFullscreen(false)}
+          >
+            <button 
+              className="absolute top-8 right-8 text-white/50 hover:text-accent transition-colors z-50 p-4 border border-white/10 rounded-full"
+              onClick={() => setIsFullscreen(false)}
+            >
+              <X size={32} />
+            </button>
+            <motion.img 
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.8, opacity: 0 }}
+              src={activeImage} 
+              alt="Fullscreen view" 
+              className="max-w-[95vw] max-h-[90vh] object-contain shadow-[0_0_100px_rgba(34,211,238,0.2)]"
+              referrerPolicy="no-referrer"
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
   );
 };
 
@@ -219,75 +321,75 @@ export const ProjectSection = () => {
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto space-y-12">
+      <div className="max-w-6xl mx-auto space-y-16">
         {PROJECTS.map((p) => (
-          <div 
+          <motion.div 
             key={p.id} 
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            whileHover={{ y: -5 }}
             className="group relative cursor-pointer"
             onClick={() => setSelectedProject(p)}
           >
-            <div className="grid grid-cols-1 lg:grid-cols-5 border border-white/10 bg-white/5 backdrop-blur-sm overflow-hidden transition-all duration-500 hover:border-accent/30">
+            <div className="grid grid-cols-1 lg:grid-cols-5 border border-white/10 bg-cyber-gray/10 backdrop-blur-md overflow-hidden transition-all duration-500 hover:border-accent/50 hover:shadow-[0_0_30px_rgba(34,211,238,0.1)] shadow-2xl">
               {/* Main Image */}
-              <div className="lg:col-span-3 relative h-64 lg:h-auto overflow-hidden grayscale group-hover:grayscale-0 transition-all duration-700">
+              <div className="lg:col-span-3 relative h-80 lg:h-auto overflow-hidden grayscale group-hover:grayscale-0 transition-all duration-700">
                 <img 
                   src={p.image} 
                   alt={p.title} 
                   className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
                   referrerPolicy="no-referrer"
                 />
-                <div className="absolute inset-0 bg-gradient-to-r from-cyber-black via-transparent to-transparent opacity-80" />
                 
-                <div className="absolute top-8 left-8 flex items-center gap-4">
-                  <div className="bg-accent/10 backdrop-blur-md border border-accent/20 p-2.5 rounded-lg">
-                    <ShieldCheck className="text-accent" size={24} />
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="text-[10px] font-mono text-accent uppercase tracking-[0.2em] leading-tight font-bold">System_Interface</span>
-                    <span className="text-xs font-mono text-white/50 uppercase tracking-widest font-light">SECURE_CORE_V4</span>
+                {/* Holographic Overlay */}
+                <div className="absolute inset-0 bg-gradient-to-tr from-cyber-black/80 via-accent/5 to-transparent opacity-60 group-hover:opacity-30 transition-opacity" />
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(34,211,238,0.1),transparent_70%)] opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
+                <div className="absolute top-8 left-8 flex items-center gap-4 z-10">
+                  <div className="bg-black/60 backdrop-blur-xl border border-accent/30 p-3 rounded-lg shadow-[0_0_20px_rgba(34,211,238,0.15)]">
+                    <ShieldCheck className="text-accent" size={28} />
                   </div>
                 </div>
               </div>
 
               {/* Content Panel */}
-              <div className="lg:col-span-2 p-8 md:p-12 flex flex-col justify-between space-y-12 bg-cyber-black/40">
-                <div className="space-y-8">
-                  <div className="flex items-center gap-3">
-                    <div className="w-1.5 h-1.5 rounded-full bg-status shadow-[0_0_10px_var(--color-status)]" />
-                    <span className="text-[10px] font-mono text-accent uppercase tracking-[0.4em] font-medium">Monitoring_Active</span>
-                  </div>
-                  
-                  <h4 className="text-2xl md:text-4xl font-bold tracking-tighter uppercase text-white leading-tight transition-colors group-hover:text-accent">
+              <div className="lg:col-span-2 p-10 md:p-14 flex flex-col justify-between space-y-12 bg-cyber-black/60 relative overflow-hidden group-hover:bg-cyber-black/80 transition-colors duration-500">
+                {/* Sweep Animation */}
+                <div className="absolute top-0 left-[-100%] w-full h-[2px] bg-gradient-to-r from-transparent via-accent/50 to-transparent group-hover:left-[100%] transition-all duration-1500 ease-in-out" />
+                
+                <div className="space-y-8 relative z-10">
+                  <h4 className="text-3xl md:text-5xl font-black tracking-tighter uppercase text-white leading-tight transition-all duration-500 group-hover:text-accent group-hover:translate-x-1">
                     {p.title}
                   </h4>
 
-                  <p className="text-sm text-cyber-muted leading-relaxed font-light line-clamp-4">
+                  <p className="text-sm text-cyber-muted leading-relaxed font-light line-clamp-4 group-hover:text-white/80 transition-colors duration-500">
                     {p.description}
                   </p>
 
                   <div className="flex flex-wrap gap-2">
                     {p.tags.map(tag => (
-                      <span key={tag} className="px-3 py-1 bg-white/5 border border-white/10 text-[9px] font-mono text-cyber-muted uppercase tracking-widest">
+                      <span key={tag} className="px-3 py-1.5 bg-white/5 border border-white/10 text-[9px] font-mono text-cyber-muted uppercase tracking-widest hover:border-accent/40 hover:text-accent hover:bg-accent/5 transition-all cursor-default">
                         {tag}
                       </span>
                     ))}
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-mono text-accent uppercase tracking-[0.2em] opacity-0 group-hover:opacity-100 transition-opacity">View Details // Investigation</span>
-                  <a 
-                    href={p.link} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    onClick={(e) => e.stopPropagation()}
-                    className="group/link flex items-center justify-between p-4 px-6 bg-accent text-black font-mono text-xs font-bold uppercase tracking-[0.3em] hover:bg-white transition-all"
-                  >
-                    <ExternalLink size={14} className="group-hover/link:scale-110 transition-transform" />
-                  </a>
+                <div className="flex flex-col gap-6 relative z-10">
+                   <div className="h-[1px] w-full bg-gradient-to-r from-accent/20 to-transparent" />
+                   <div className="flex items-center justify-end">
+                    <motion.div
+                      whileHover={{ scale: 1.1, rotate: 5 }}
+                      whileTap={{ scale: 0.9 }}
+                      className="p-4 bg-accent text-black shadow-[0_0_20px_rgba(34,211,238,0.2)] group-hover:shadow-[0_0_30px_rgba(34,211,238,0.5)] transition-all"
+                    >
+                      <ExternalLink size={20} />
+                    </motion.div>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
+          </motion.div>
         ))}
       </div>
 
@@ -407,7 +509,7 @@ export const ContactSection = () => {
               whileTap={{ scale: 0.98 }}
               className="w-full bg-accent text-black font-mono font-bold uppercase tracking-widest py-4 flex items-center justify-center gap-2 transition-all border border-accent shadow-[0_0_15px_var(--color-accent-soft)] cursor-pointer"
             >
-              <span>Transmit Protocol</span>
+              <span>Send Message</span>
               <motion.div
                 animate={{ x: [0, 5, 0] }}
                 transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}

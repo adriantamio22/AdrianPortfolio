@@ -100,7 +100,7 @@ export const Hero = () => {
           >
             <div className="flex items-center gap-2 mb-6 text-accent font-mono text-sm tracking-[0.4em] uppercase">
               <Shield size={16} />
-              <span>Work Portfolio // Operations_Active</span>
+              <span>Work Portfolio</span>
             </div>
 
             <h1 className="text-5xl md:text-8xl font-bold mb-6 tracking-tighter leading-tight uppercase">

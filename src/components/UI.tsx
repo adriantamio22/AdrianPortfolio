@@ -103,7 +103,7 @@ export const Section = ({ children, id, className = "" }: { children: ReactNode,
   </section>
 );
 
-export const Badge = ({ children, variant = 'cyan' }: { children: React.ReactNode, variant?: 'cyan' | 'green' | 'gray', key?: any }) => {
+export const Badge = ({ children, variant = 'cyan', className = "" }: { children: React.ReactNode, variant?: 'cyan' | 'green' | 'gray', className?: string, key?: React.Key }) => {
   const styles = {
     cyan: "bg-accent/10 text-accent border-accent/20",
     green: "bg-status/10 text-status border-status/20",
@@ -111,7 +111,7 @@ export const Badge = ({ children, variant = 'cyan' }: { children: React.ReactNod
   };
 
   return (
-    <span className={`px-2 py-1 text-[10px] md:text-xs font-mono border rounded uppercase tracking-wider ${styles[variant]}`}>
+    <span className={`px-2 py-1 text-[10px] md:text-xs font-mono border rounded uppercase tracking-wider ${styles[variant]} ${className}`}>
       {children}
     </span>
   );
