@@ -334,7 +334,7 @@ export const ProjectSection = () => {
           >
             <div className="grid grid-cols-1 lg:grid-cols-5 border border-white/10 bg-cyber-gray/10 backdrop-blur-md overflow-hidden transition-all duration-500 hover:border-accent/50 hover:shadow-[0_0_30px_rgba(34,211,238,0.1)] shadow-2xl">
               {/* Main Image */}
-              <div className="lg:col-span-3 relative h-80 lg:h-auto overflow-hidden grayscale group-hover:grayscale-0 transition-all duration-700">
+              <div className="lg:col-span-3 relative h-80 lg:h-auto overflow-hidden transition-all duration-700">
                 <img 
                   src={p.image} 
                   alt={p.title} 
