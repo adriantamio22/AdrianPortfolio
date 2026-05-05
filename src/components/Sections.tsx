@@ -167,7 +167,6 @@ const ProjectModal = ({ project, onClose }: { project: any; onClose: () => void 
                     src={activeImage} 
                     alt={project.title} 
                     className="w-full h-full object-contain cursor-zoom-in" 
-                    referrerPolicy="no-referrer" 
                     onClick={() => setIsFullscreen(true)}
                   />
                 </motion.div>
@@ -261,7 +260,7 @@ const ProjectModal = ({ project, onClose }: { project: any; onClose: () => void 
                       onClick={() => setActiveImage(img)}
                       className={`relative w-24 h-16 md:w-32 md:h-20 border overflow-hidden transition-all duration-300 rounded ${activeImage === img ? 'border-accent ring-2 ring-accent/30 p-0.5' : 'border-white/10 opacity-50 hover:opacity-100'}`}
                     >
-                      <img src={img} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                      <img src={img} className="w-full h-full object-cover" />
                       {activeImage === img && (
                         <div className="absolute inset-0 bg-accent/20 pointer-events-none transition-opacity duration-300" />
                       )}
@@ -297,7 +296,6 @@ const ProjectModal = ({ project, onClose }: { project: any; onClose: () => void 
               src={activeImage} 
               alt="Fullscreen view" 
               className="max-w-[95vw] max-h-[90vh] object-contain shadow-[0_0_100px_rgba(34,211,238,0.2)]"
-              referrerPolicy="no-referrer"
             />
           </motion.div>
         )}
@@ -339,7 +337,6 @@ export const ProjectSection = () => {
                   src={p.image} 
                   alt={p.title} 
                   className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
-                  referrerPolicy="no-referrer"
                 />
                 
                 {/* Holographic Overlay */}
