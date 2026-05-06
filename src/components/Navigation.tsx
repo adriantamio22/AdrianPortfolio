@@ -197,13 +197,13 @@ export const Hero = () => {
           <motion.div variants={itemVariants} className="flex flex-col md:flex-row md:items-center gap-4 mb-10">
             <div className="flex items-center gap-2">
               <h2 className="text-xl md:text-2xl font-mono text-cyber-text tracking-tight uppercase">
-                &gt; Security Operations Analyst
+                &gt; Cybersecurity Analyst
               </h2>
             </div>
             <div className="hidden md:block w-1.5 h-1.5 rounded-full animate-pulse bg-status shadow-[0_0_8px_var(--color-status)]" />
             <div className="flex items-center gap-2">
               <h2 className="text-xl md:text-2xl font-mono text-cyber-muted tracking-tight uppercase">
-                &gt; IT Specialist
+                &gt; IT Support
               </h2>
             </div>
           </motion.div>

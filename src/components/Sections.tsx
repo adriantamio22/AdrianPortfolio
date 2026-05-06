@@ -20,7 +20,7 @@ export const AboutSection = () => {
           </h3>
           <div className="space-y-6 text-cyber-muted font-light leading-relaxed">
             <p>
-              I am a dedicated Cybersecurity Analyst and Jira Project Administrator, 
+              I am a dedicated Cybersecurity Analyst and IT Support, 
               where I engineer custom ticketing solutions and high-fidelity incident workflows.
             </p>
             <p>
