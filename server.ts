@@ -170,72 +170,94 @@ async function callGemini(apiKey: string, message: string): Promise<string> {
     },
   });
 
-  const response = await ai.models.generateContent({
-    model: "gemini-4-hydrogen",
-    contents: message,
-    config: {
-      systemInstruction: SYSTEM_PROMPT,
-    },
-  });
+  const models = ["gemini-4-hydrogen", "gemini-2.5-flash"];
+  let lastErr: unknown;
 
-  const text = response.text?.trim();
-  return text || "PROTOCOL_ERROR: EMPTY_RESPONSE.";
+  for (const model of models) {
+    try {
+      const response = await ai.models.generateContent({
+        model,
+        contents: message,
+        config: {
+          systemInstruction: SYSTEM_PROMPT,
+        },
+      });
+      const text = response.text?.trim();
+      return text || "PROTOCOL_ERROR: EMPTY_RESPONSE.";
+    } catch (err) {
+      lastErr = err;
+    }
+  }
+
+  throw lastErr instanceof Error ? lastErr : new Error("Gemini request failed");
 }
 
 function answerFromPortfolio(message: string): string {
-  const q = message.toLowerCase();
+  const q = message.toLowerCase().trim();
 
-  if (/^(hi|hello|hey|yo|sup|greetings)\b/.test(q.trim())) {
-    return "SYSTEM_ONLINE: ADRIAN TAMIO PORTFOLIO CORE READY. ASK ABOUT SKILLS, TOOLS, CERTIFICATIONS, PROJECTS, OR CONTACT.";
+  if (/^(hi|hello|hey|yo|sup|greetings|good\s+(morning|afternoon|evening))\b/.test(q)) {
+    return "SYSTEM_ONLINE: ADRIAN TAMIO PORTFOLIO CORE READY. ASK ABOUT HIS ROLE, SKILLS, TOOLS, CERTIFICATIONS, SCAM SCANNER, OR CONTACT INFO.";
   }
-  if (/cert|qualys|fortinet|sc-200|az-900|aws|proofpoint|google/.test(q)) {
-    return "CERTIFICATIONS: GOOGLE CYBERSECURITY PROFESSIONAL, MICROSOFT SC-200, AWS CLOUD PRACTITIONER ESSENTIALS, QUALYS EDR, FORTINET FCA CYBERSECURITY, PROOFPOINT AI DATA SECURITY SPECIALIST 2025, MICROSOFT AZ-900.";
+  if (/thank|thanks|thx|appreciate/.test(q)) {
+    return "ACKNOWLEDGED. STANDING BY FOR FURTHER QUERIES — OR REACH ADRIAN AT ADRIANTAMIO@GMAIL.COM.";
   }
-  if (/project|scam|scanner|virustotal|abuseipdb|mailbox|work|build|built/.test(q)) {
-    return "PROJECT: SCAM SCANNER — MULTI-VECTOR THREAT ANALYZER WITH URL ANALYSIS, MAILBOX FORENSICS, IP REPUTATION, MALWARE CHECKING & PHISHING DETECTION. BUILT WITH REACT, MAILBOXVALIDATOR, VIRUSTOTAL API, ABUSEIPDB. LIVE: https://scam-scanner1.vercel.app/";
+  if (/scam\s*scanner|virustotal|abuseipdb|mailboxvalidator|mailbox|url\s*analysis|ip\s*reputation/.test(q)) {
+    return "PROJECT [SCAM SCANNER]: MULTI-VECTOR THREAT ANALYZER WITH REAL-TIME URL ANALYSIS, MAILBOX FORENSICS, IP REPUTATION CHECKING, MALWARE CHECKING, AND PHISHING PATTERN DETECTION. BUILT WITH REACT, MAILBOXVALIDATOR, VIRUSTOTAL API, AND ABUSEIPDB. LIVE: https://scam-scanner1.vercel.app/";
   }
-  if (/tool|wazuh|sentinel|defender|intune|entra|active directory|abnormal|jira|siem|edr|stack|tech/.test(q)) {
+  if (/project|portfolio|built|build|app|work\b/.test(q)) {
+    return "FEATURED_PROJECT: SCAM SCANNER — AN ADVANCED MULTI-VECTOR THREAT ANALYZER (URL, MAILBOX, IP, MALWARE & PHISHING ANALYSIS) BUILT WITH REACT, MAILBOXVALIDATOR, VIRUSTOTAL API & ABUSEIPDB. LIVE AT: https://scam-scanner1.vercel.app/";
+  }
+  if (/cert|qualys|fortinet|sc-200|az-900|proofpoint|validation|credential|license/.test(q)) {
+    return "CERTIFICATIONS: GOOGLE CYBERSECURITY PROFESSIONAL CERTIFICATE, MICROSOFT SECURITY OPERATIONS ANALYST (SC-200), AWS CLOUD PRACTITIONER ESSENTIALS, QUALYS ENDPOINT DETECTION AND RESPONSE, FORTINET CERTIFIED ASSOCIATE (CYBERSECURITY), PROOFPOINT CERTIFIED AI DATA SECURITY SPECIALIST 2025, MICROSOFT AZURE FUNDAMENTALS (AZ-900).";
+  }
+  if (/wazuh|sentinelone|sentinel|defender|intune|entra|active directory|abnormal|jira|siem|edr|ticket/.test(q)) {
+    return "OPERATIONAL_TOOLKIT: WAZUH SIEM, SENTINELONE (EDR), MICROSOFT DEFENDER, MS INTUNE, ENTRA ID / ACTIVE DIRECTORY, ABNORMAL AI, JIRA PROJECT ADMIN, AND REMOTE SUPPORT TOOLS — USED DAILY FOR DEFENSIVE MONITORING, INCIDENT TRIAGE, AND MICROSOFT ECOSYSTEM SUPPORT.";
+  }
+  if (/microsoft|m365|365|azure|aws|cloud/.test(q)) {
+    return "CLOUD & MICROSOFT: EXPERIENCED IN MICROSOFT 365 TROUBLESHOOTING, ENTRA ID / ACTIVE DIRECTORY ADMIN, MS INTUNE, MICROSOFT DEFENDER, AZURE (AZ-900 & SC-200 CERTIFIED), AND AWS (CLOUD PRACTITIONER ESSENTIALS).";
+  }
+  if (/interest|hobby|hobbies|ctf|beyond|outside|free time|fun/.test(q)) {
+    return "EXPLORATION: CTF CHALLENGES, OPEN SOURCE SECURITY TOOLS, CLOUD ARCHITECTURE, AND AI ETHICS IN SECURITY.";
+  }
+  if (/skill|security|support|it\b|incident|phishing|threat|hunt|vulnerab|monitor|defens|desktop|remote/.test(q)) {
+    return "SKILLS: [SECURITY] INCIDENT RESPONSE & PHISHING DEFENSE, DEFENSIVE MONITORING, THREAT HUNTING, VULNERABILITY MANAGEMENT, EDR | [IT SUPPORT] MICROSOFT ENVIRONMENT TROUBLESHOOTING, TICKETING & INCIDENT MANAGEMENT, EMAIL TECH SUPPORT, ENTRA ID/AD ADMIN, REMOTE DESKTOP SUPPORT.";
+  }
+  if (/tool|stack|tech|software|platform/.test(q)) {
     return "TOOLS: WAZUH SIEM, SENTINELONE, MICROSOFT DEFENDER, MS INTUNE, ENTRA ID / ACTIVE DIRECTORY, ABNORMAL AI, JIRA PROJECT ADMIN, REMOTE SUPPORT TOOLS.";
   }
-  if (/skill|security|support|it |incident|phishing|threat|hunt|vulnerab|ticket|microsoft|m365/.test(q)) {
-    return "SKILLS: CYBERSECURITY ANALYST (INCIDENT RESPONSE, PHISHING DEFENSE, DEFENSIVE MONITORING, THREAT HUNTING, VULNERABILITY MANAGEMENT, EDR) & IT SUPPORT (MICROSOFT ECOSYSTEM, TICKETING, EMAIL SUPPORT, ENTRA ID/AD, REMOTE DESKTOP).";
+  if (/available|hire|hiring|open to|freelance|collaborat|opportunity|resume|cv/.test(q)) {
+    return "AVAILABILITY: AVAILABLE FOR COLLABORATIONS ON SECURITY INFRASTRUCTURE, THREAT HUNTING, OR ENTERPRISE TECHNICAL SUPPORT. REACH OUT AT ADRIANTAMIO@GMAIL.COM OR https://www.linkedin.com/in/adrian-t-41019727b/";
   }
-  if (/contact|email|mail|linkedin|hire|reach|connect|social/.test(q)) {
+  if (/contact|email|mail|linkedin|reach|connect|social|message/.test(q)) {
     return "CONTACT: ADRIANTAMIO@GMAIL.COM | LINKEDIN: https://www.linkedin.com/in/adrian-t-41019727b/";
   }
-  if (/who|adrian|about|bio|role|job|title|name|background|experience/.test(q)) {
-    return "IDENTITY: ADRIAN TAMIO — CYBERSECURITY ANALYST & IT SUPPORT SPECIALIZING IN DEFENSIVE MONITORING, INCIDENT RESPONSE, AND MICROSOFT ENTERPRISE OPERATIONS. CONTACT: ADRIANTAMIO@GMAIL.COM";
+  if (/who|adrian|about|bio|role|job|title|name|background|experience|summary|tell me/.test(q)) {
+    return "IDENTITY: ADRIAN TAMIO — CYBERSECURITY ANALYST & IT SUPPORT SPECIALIZING IN DEFENSIVE MONITORING (WAZUH, SENTINELONE), INCIDENT RESPONSE, AND MICROSOFT ENTERPRISE OPERATIONS (M365, ENTRA ID, INTUNE, JIRA).";
   }
 
-  return "INFO: ADRIAN TAMIO IS A CYBERSECURITY ANALYST & IT SUPPORT SPECIALIST. ASK ABOUT SKILLS, TOOLS, CERTIFICATIONS, OR SCAM SCANNER — OR REACH OUT AT ADRIANTAMIO@GMAIL.COM.";
+  return "DATA_NOT_IN_INDEX: THAT DETAIL IS NOT LISTED IN THE PORTFOLIO ARCHIVE. CONTACT ADRIAN AT ADRIANTAMIO@GMAIL.COM — OR ASK ABOUT HIS SKILLS, TOOLS, CERTIFICATIONS, OR SCAM SCANNER.";
 }
 
-async function generateReply(message: string): Promise<string> {
+async function generateReply(message: string): Promise<{ reply: string; provider: string }> {
   const groqKey = (process.env.GROQ_API_KEY || process.env.VITE_GROQ_API_KEY || "").trim();
   const geminiKey = (process.env.GEMINI_API_KEY || "").trim();
 
   if (groqKey) {
     try {
-      return await callGroq(groqKey, message);
+      return { reply: await callGroq(groqKey, message), provider: "groq" };
     } catch (groqErr) {
-      console.error("Groq error, checking fallback:", groqErr);
       if (geminiKey) {
-        return await callGemini(geminiKey, message);
+        return { reply: await callGemini(geminiKey, message), provider: "gemini" };
       }
-      return answerFromPortfolio(message);
+      throw groqErr;
     }
   }
 
   if (geminiKey) {
-    try {
-      return await callGemini(geminiKey, message);
-    } catch (geminiErr) {
-      console.error("Gemini error, using portfolio index:", geminiErr);
-      return answerFromPortfolio(message);
-    }
+    return { reply: await callGemini(geminiKey, message), provider: "gemini" };
   }
 
-  return answerFromPortfolio(message);
+  return { reply: answerFromPortfolio(message), provider: "local-index" };
 }
 
 async function startServer() {
@@ -251,7 +273,8 @@ async function startServer() {
     }
 
     try {
-      const reply = await generateReply(message);
+      const { reply, provider } = await generateReply(message);
+      res.setHeader("X-AI-Provider", provider);
       return res.json({ reply });
     } catch (err: any) {
       console.error("Chat error:", err);
