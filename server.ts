@@ -3,6 +3,7 @@ import express from "express";
 import { createServer as createViteServer } from "vite";
 import path from "path";
 import { fileURLToPath } from "url";
+import { GoogleGenAI } from "@google/genai";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -122,10 +123,7 @@ function isModelAccessError(status: number | undefined, message: string | undefi
   return /model|does not exist|do not have access|decommissioned|deprecated|not found/i.test(message || "");
 }
 
-async function callGroq(message: string): Promise<string> {
-  const apiKey = process.env.GROQ_API_KEY;
-  if (!apiKey) throw new Error("GROQ_API_KEY not configured");
-
+async function callGroq(apiKey: string, message: string): Promise<string> {
   const primaryModel = cachedGroqModel || PREFERRED_MODELS[0];
   const firstAttempt = await requestGroqCompletion(apiKey, primaryModel, message);
   if (firstAttempt.ok && firstAttempt.text) {
@@ -162,19 +160,98 @@ async function callGroq(message: string): Promise<string> {
   throw new Error(lastError);
 }
 
+async function callGemini(apiKey: string, message: string): Promise<string> {
+  const ai = new GoogleGenAI({
+    apiKey,
+    httpOptions: {
+      headers: {
+        "User-Agent": "aistudio-build",
+      },
+    },
+  });
+
+  const response = await ai.models.generateContent({
+    model: "gemini-4-hydrogen",
+    contents: message,
+    config: {
+      systemInstruction: SYSTEM_PROMPT,
+    },
+  });
+
+  const text = response.text?.trim();
+  return text || "PROTOCOL_ERROR: EMPTY_RESPONSE.";
+}
+
+function answerFromPortfolio(message: string): string {
+  const q = message.toLowerCase();
+
+  if (/^(hi|hello|hey|yo|sup|greetings)\b/.test(q.trim())) {
+    return "SYSTEM_ONLINE: ADRIAN TAMIO PORTFOLIO CORE READY. ASK ABOUT SKILLS, TOOLS, CERTIFICATIONS, PROJECTS, OR CONTACT.";
+  }
+  if (/cert|qualys|fortinet|sc-200|az-900|aws|proofpoint|google/.test(q)) {
+    return "CERTIFICATIONS: GOOGLE CYBERSECURITY PROFESSIONAL, MICROSOFT SC-200, AWS CLOUD PRACTITIONER ESSENTIALS, QUALYS EDR, FORTINET FCA CYBERSECURITY, PROOFPOINT AI DATA SECURITY SPECIALIST 2025, MICROSOFT AZ-900.";
+  }
+  if (/project|scam|scanner|virustotal|abuseipdb|mailbox|work|build|built/.test(q)) {
+    return "PROJECT: SCAM SCANNER — MULTI-VECTOR THREAT ANALYZER WITH URL ANALYSIS, MAILBOX FORENSICS, IP REPUTATION, MALWARE CHECKING & PHISHING DETECTION. BUILT WITH REACT, MAILBOXVALIDATOR, VIRUSTOTAL API, ABUSEIPDB. LIVE: https://scam-scanner1.vercel.app/";
+  }
+  if (/tool|wazuh|sentinel|defender|intune|entra|active directory|abnormal|jira|siem|edr|stack|tech/.test(q)) {
+    return "TOOLS: WAZUH SIEM, SENTINELONE, MICROSOFT DEFENDER, MS INTUNE, ENTRA ID / ACTIVE DIRECTORY, ABNORMAL AI, JIRA PROJECT ADMIN, REMOTE SUPPORT TOOLS.";
+  }
+  if (/skill|security|support|it |incident|phishing|threat|hunt|vulnerab|ticket|microsoft|m365/.test(q)) {
+    return "SKILLS: CYBERSECURITY ANALYST (INCIDENT RESPONSE, PHISHING DEFENSE, DEFENSIVE MONITORING, THREAT HUNTING, VULNERABILITY MANAGEMENT, EDR) & IT SUPPORT (MICROSOFT ECOSYSTEM, TICKETING, EMAIL SUPPORT, ENTRA ID/AD, REMOTE DESKTOP).";
+  }
+  if (/contact|email|mail|linkedin|hire|reach|connect|social/.test(q)) {
+    return "CONTACT: ADRIANTAMIO@GMAIL.COM | LINKEDIN: https://www.linkedin.com/in/adrian-t-41019727b/";
+  }
+  if (/who|adrian|about|bio|role|job|title|name|background|experience/.test(q)) {
+    return "IDENTITY: ADRIAN TAMIO — CYBERSECURITY ANALYST & IT SUPPORT SPECIALIZING IN DEFENSIVE MONITORING, INCIDENT RESPONSE, AND MICROSOFT ENTERPRISE OPERATIONS. CONTACT: ADRIANTAMIO@GMAIL.COM";
+  }
+
+  return "INFO: ADRIAN TAMIO IS A CYBERSECURITY ANALYST & IT SUPPORT SPECIALIST. ASK ABOUT SKILLS, TOOLS, CERTIFICATIONS, OR SCAM SCANNER — OR REACH OUT AT ADRIANTAMIO@GMAIL.COM.";
+}
+
+async function generateReply(message: string): Promise<string> {
+  const groqKey = (process.env.GROQ_API_KEY || process.env.VITE_GROQ_API_KEY || "").trim();
+  const geminiKey = (process.env.GEMINI_API_KEY || "").trim();
+
+  if (groqKey) {
+    try {
+      return await callGroq(groqKey, message);
+    } catch (groqErr) {
+      console.error("Groq error, checking fallback:", groqErr);
+      if (geminiKey) {
+        return await callGemini(geminiKey, message);
+      }
+      return answerFromPortfolio(message);
+    }
+  }
+
+  if (geminiKey) {
+    try {
+      return await callGemini(geminiKey, message);
+    } catch (geminiErr) {
+      console.error("Gemini error, using portfolio index:", geminiErr);
+      return answerFromPortfolio(message);
+    }
+  }
+
+  return answerFromPortfolio(message);
+}
+
 async function startServer() {
   const app = express();
   const PORT = 3000;
 
   app.use(express.json());
 
-  // API Route
   app.post("/api/chat", async (req, res) => {
     const { message } = req.body ?? {};
-    if (!message) return res.status(400).json({ error: "No message provided" });
+    if (!message || typeof message !== "string") {
+      return res.status(400).json({ error: "No message provided" });
+    }
 
     try {
-      const reply = await callGroq(message);
+      const reply = await generateReply(message);
       return res.json({ reply });
     } catch (err: any) {
       console.error("Chat error:", err);
@@ -182,7 +259,6 @@ async function startServer() {
     }
   });
 
-  // Vite middleware for development
   if (process.env.NODE_ENV !== "production") {
     const vite = await createViteServer({
       server: { middlewareMode: true },

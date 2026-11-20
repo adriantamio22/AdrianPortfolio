@@ -134,8 +134,9 @@ export const TerminalConsole = () => {
       } else {
         setHistory(prev => [...prev, "PROTOCOL_ERROR: NO_RESPONSE."]);
       }
-    } catch {
-      setHistory(prev => [...prev, "SYSTEM_FAILURE: CONNECTION TO AI CORE INTERRUPTED."]);
+    } catch (err) {
+      const detail = err instanceof Error ? err.message : "NETWORK_ERROR";
+      setHistory(prev => [...prev, `SYSTEM_FAILURE: CONNECTION TO AI CORE INTERRUPTED (${detail}).`]);
     } finally {
       setIsTyping(false);
     }
