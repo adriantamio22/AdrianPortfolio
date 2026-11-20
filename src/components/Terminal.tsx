@@ -120,11 +120,19 @@ export const TerminalConsole = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: query }),
       });
-      const data = await res.json();
+      const rawText = await res.text();
+      let data: { reply?: string; error?: string } = {};
+      try {
+        data = JSON.parse(rawText);
+      } catch {
+        // Non-JSON response (e.g., HTML error/fallback page)
+      }
       if (!res.ok) {
-        setHistory(prev => [...prev, `SYSTEM_ERROR: ${data.error || "AI_CORE_FAILURE."}`]);
+        setHistory(prev => [...prev, `SYSTEM_ERROR: ${data.error || `HTTP_${res.status}`}`]);
+      } else if (data.reply) {
+        setHistory(prev => [...prev, data.reply]);
       } else {
-        setHistory(prev => [...prev, data.reply || "PROTOCOL_ERROR: NO_RESPONSE."]);
+        setHistory(prev => [...prev, "PROTOCOL_ERROR: NO_RESPONSE."]);
       }
     } catch {
       setHistory(prev => [...prev, "SYSTEM_FAILURE: CONNECTION TO AI CORE INTERRUPTED."]);
