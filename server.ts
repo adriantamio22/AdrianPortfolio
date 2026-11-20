@@ -1,3 +1,4 @@
+import "dotenv/config";
 import express from "express";
 import { createServer as createViteServer } from "vite";
 import path from "path";
@@ -36,9 +37,43 @@ RESPONSE RULES:
 - Never invent projects, certifications, or skills not listed above
 - If unsure, direct to adriantamio@gmail.com`;
 
-async function callGroq(message: string): Promise<string> {
-  const apiKey = process.env.GROQ_API_KEY;
-  if (!apiKey) throw new Error("GROQ_API_KEY not configured");
+const PREFERRED_MODELS = [
+  "openai/gpt-oss-20b",
+  "meta-llama/llama-4-scout-17b-16e-instruct",
+  "llama-3.3-70b-versatile",
+  "openai/gpt-oss-120b",
+  "meta-llama/llama-4-maverick-17b-128e-instruct",
+  "qwen/qwen3-32b",
+  "llama-3.1-8b-instant",
+];
+
+let cachedGroqModel: string | null = null;
+
+interface GroqResult {
+  ok: boolean;
+  text?: string;
+  status?: number;
+  message?: string;
+}
+
+async function requestGroqCompletion(
+  apiKey: string,
+  model: string,
+  message: string
+): Promise<GroqResult> {
+  const payload: Record<string, unknown> = {
+    model,
+    messages: [
+      { role: "system", content: SYSTEM_PROMPT },
+      { role: "user", content: message },
+    ],
+    max_completion_tokens: 1024,
+    temperature: 0.5,
+  };
+
+  if (model.startsWith("openai/gpt-oss")) {
+    payload.reasoning_effort = "low";
+  }
 
   const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
     method: "POST",
@@ -46,24 +81,85 @@ async function callGroq(message: string): Promise<string> {
       "Authorization": `Bearer ${apiKey}`,
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({
-      model: "llama-3.1-8b-instant",
-      messages: [
-        { role: "system", content: SYSTEM_PROMPT },
-        { role: "user", content: message },
-      ],
-      max_tokens: 300,
-      temperature: 0.5,
-    }),
+    body: JSON.stringify(payload),
   });
 
+  const data = await res.json().catch(() => ({}));
   if (!res.ok) {
-    const err = await res.json();
-    throw new Error(err.error?.message || `API error ${res.status}`);
+    return {
+      ok: false,
+      status: res.status,
+      message: data?.error?.message || `API error ${res.status}`,
+    };
   }
 
-  const data = await res.json();
-  return data.choices[0].message.content;
+  const rawText: string = data?.choices?.[0]?.message?.content || "";
+  const cleanedText = rawText.replace(/<think>[\s\S]*?<\/think>/gi, "").trim();
+  return { ok: true, text: cleanedText || "PROTOCOL_ERROR: EMPTY_RESPONSE." };
+}
+
+async function fetchAvailableGroqModels(apiKey: string): Promise<string[]> {
+  const res = await fetch("https://api.groq.com/openai/v1/models", {
+    headers: { "Authorization": `Bearer ${apiKey}` },
+  });
+  if (!res.ok) return [];
+  const data = await res.json().catch(() => ({}));
+  const ids: string[] = Array.isArray(data?.data)
+    ? data.data.map((m: { id?: string }) => m.id).filter((id: unknown): id is string => typeof id === "string")
+    : [];
+
+  const chatModels = ids.filter(
+    (id) => !/whisper|guard|tts|orpheus|embed|playai|distil/i.test(id)
+  );
+
+  const prioritized = PREFERRED_MODELS.filter((m) => chatModels.includes(m));
+  const remaining = chatModels.filter((m) => !prioritized.includes(m));
+  return [...prioritized, ...remaining];
+}
+
+function isModelAccessError(status: number | undefined, message: string | undefined): boolean {
+  if (status === 404) return true;
+  return /model|does not exist|do not have access|decommissioned|deprecated|not found/i.test(message || "");
+}
+
+async function callGroq(message: string): Promise<string> {
+  const apiKey = process.env.GROQ_API_KEY;
+  if (!apiKey) throw new Error("GROQ_API_KEY not configured");
+
+  const primaryModel = cachedGroqModel || PREFERRED_MODELS[0];
+  const firstAttempt = await requestGroqCompletion(apiKey, primaryModel, message);
+  if (firstAttempt.ok && firstAttempt.text) {
+    cachedGroqModel = primaryModel;
+    return firstAttempt.text;
+  }
+
+  if (!isModelAccessError(firstAttempt.status, firstAttempt.message)) {
+    throw new Error(firstAttempt.message || "AI core failure");
+  }
+
+  cachedGroqModel = null;
+  const availableModels = await fetchAvailableGroqModels(apiKey);
+  const candidates = Array.from(
+    new Set([
+      ...availableModels,
+      ...PREFERRED_MODELS,
+    ])
+  ).filter((m) => m !== primaryModel);
+
+  let lastError = firstAttempt.message || "No accessible Groq model found";
+  for (const model of candidates) {
+    const attempt = await requestGroqCompletion(apiKey, model, message);
+    if (attempt.ok && attempt.text) {
+      cachedGroqModel = model;
+      return attempt.text;
+    }
+    lastError = attempt.message || lastError;
+    if (!isModelAccessError(attempt.status, attempt.message)) {
+      throw new Error(lastError);
+    }
+  }
+
+  throw new Error(lastError);
 }
 
 async function startServer() {

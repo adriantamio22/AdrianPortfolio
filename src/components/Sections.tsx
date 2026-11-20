@@ -12,7 +12,7 @@ export const AboutSection = () => {
           <div className="flex items-center gap-3 mb-6">
             <div className="w-12 h-[1px] bg-accent" />
             <h2 className="text-sm font-mono uppercase tracking-[0.3em] text-accent">
-              Biography
+              About
             </h2>
           </div>
           <h3 className="text-3xl md:text-4xl font-bold mb-8 tracking-tight">

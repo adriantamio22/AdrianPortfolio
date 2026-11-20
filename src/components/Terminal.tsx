@@ -121,7 +121,11 @@ export const TerminalConsole = () => {
         body: JSON.stringify({ message: query }),
       });
       const data = await res.json();
-      setHistory(prev => [...prev, data.reply || "PROTOCOL_ERROR: NO_RESPONSE."]);
+      if (!res.ok) {
+        setHistory(prev => [...prev, `SYSTEM_ERROR: ${data.error || "AI_CORE_FAILURE."}`]);
+      } else {
+        setHistory(prev => [...prev, data.reply || "PROTOCOL_ERROR: NO_RESPONSE."]);
+      }
     } catch {
       setHistory(prev => [...prev, "SYSTEM_FAILURE: CONNECTION TO AI CORE INTERRUPTED."]);
     } finally {
